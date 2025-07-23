@@ -56,11 +56,12 @@ class CF7_Origin_Protection {
 	 * @return mixed
 	 */
 	public function validate_cf7_origin( $result, $server, $request ) {
-		// Only check CF7 feedback submissions (actual form submissions)
-		if ( strpos( $request->get_route(), '/contact-form-7/v1/' ) === false ||
-		     strpos( $request->get_route(), '/feedback' ) === false ) {
-			return $result;
-		}
+        // Only check CF7 feedback submissions (actual form submissions).
+        // Must be a CF7 route AND end with /feedback (not /feedback/schema etc.).
+        if ( strpos( $route, '/contact-form-7/v1/' ) === false ||
+            ! preg_match( '/\/feedback$/', $route ) ) {
+            return $result;
+        }
 
 		$origin      = $_SERVER['HTTP_ORIGIN'] ?? '';
 		$site_url    = get_site_url();
