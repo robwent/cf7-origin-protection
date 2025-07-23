@@ -56,8 +56,9 @@ class CF7_Origin_Protection {
 	 * @return mixed
 	 */
 	public function validate_cf7_origin( $result, $server, $request ) {
-		// Only check CF7 REST API requests
-		if ( strpos( $request->get_route(), '/contact-form-7/v1/' ) === false ) {
+		// Only check CF7 feedback submissions (actual form submissions)
+		if ( strpos( $request->get_route(), '/contact-form-7/v1/' ) === false ||
+		     strpos( $request->get_route(), '/feedback' ) === false ) {
 			return $result;
 		}
 
