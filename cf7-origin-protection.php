@@ -56,6 +56,8 @@ class CF7_Origin_Protection {
 	 * @return mixed
 	 */
 	public function validate_cf7_origin( $result, $server, $request ) {
+		$route = $request->get_route();
+
         // Only check CF7 feedback submissions (actual form submissions).
         // Must be a CF7 route AND end with /feedback (not /feedback/schema etc.).
         if ( strpos( $route, '/contact-form-7/v1/' ) === false ||
