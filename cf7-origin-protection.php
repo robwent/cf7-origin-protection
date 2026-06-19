@@ -65,18 +65,28 @@ class CF7_Origin_Protection {
             return $result;
         }
 
-		$origin      = $_SERVER['HTTP_ORIGIN'] ?? '';
+		// Prefer the Origin header; fall back to Referer when Origin is absent
+		// (some privacy extensions / proxies strip Origin on same-origin POSTs).
+		$source = ! empty( $_SERVER['HTTP_ORIGIN'] ) ? $_SERVER['HTTP_ORIGIN']
+			: ( ! empty( $_SERVER['HTTP_REFERER'] ) ? $_SERVER['HTTP_REFERER'] : '' );
+
 		$site_url    = get_site_url();
 		$parsed_site = parse_url( $site_url );
 		$site_host   = $parsed_site['host'];
 
+		// No Origin or Referer to verify against: allow, and rely on CF7's own
+		// nonce/validation rather than block a potentially legitimate submission.
+		if ( '' === $source ) {
+			return $result;
+		}
+
 		// Allow requests from the same domain
-		if ( ! empty( $origin ) && str_contains( $origin, $site_host ) ) {
+		if ( str_contains( $source, $site_host ) ) {
 			return $result;
 		}
 
 		// Log blocked attempt for debugging
-		error_log( "CF7 Origin Protection: Blocked submission from origin: {$origin} (expected: {$site_host})" );
+		error_log( "CF7 Origin Protection: Blocked submission from source: {$source} (expected: {$site_host})" );
 
 		// Block invalid origin
 		return new WP_REST_Response( [
